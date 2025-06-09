@@ -7,13 +7,31 @@ let supabaseClient;
 // 初始化Supabase客户端
 function initSupabase() {
   try {
+    console.log('开始初始化Supabase客户端...');
+    console.log('URL:', SUPABASE_URL);
+    console.log('ANON_KEY长度:', SUPABASE_ANON_KEY ? SUPABASE_ANON_KEY.length : 0);
+    
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      throw new Error('Supabase配置不完整，请检查SUPABASE_URL和SUPABASE_ANON_KEY');
+    }
+    
+    if (typeof supabase === 'undefined') {
+      throw new Error('Supabase库未加载，请检查网络连接');
+    }
+    
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    if (!supabaseClient) {
+      throw new Error('Supabase客户端创建失败');
+    }
+    
     console.log('Supabase客户端初始化完成');
     
     // 检查用户登录状态
     checkAuthState();
   } catch (error) {
     console.error('Supabase初始化失败:', error);
+    alert('Supabase初始化失败: ' + error.message + '\n请检查控制台获取更多信息');
   }
 }
 
@@ -91,10 +109,22 @@ function updateUIForLoggedOutUser() {
 // 处理登录
 async function handleLogin(email, password) {
   try {
+    console.log('开始登录流程，邮箱:', email);
+    
+    // 检查Supabase客户端是否已初始化
+    if (!supabaseClient) {
+      console.error('Supabase客户端未初始化');
+      showError('系统错误: Supabase客户端未初始化');
+      return false;
+    }
+    
+    console.log('调用Supabase auth.signInWithPassword...');
     const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
       password
     });
+    
+    console.log('Supabase auth.signInWithPassword返回:', data ? '有数据' : '无数据', error);
     
     if (error) throw error;
     
@@ -103,8 +133,17 @@ async function handleLogin(email, password) {
     checkAuthState();
     return true;
   } catch (error) {
-    console.error('登录错误:', error.message);
-    showError('登录失败: ' + error.message);
+    console.error('登录错误详情:', error);
+    let errorMsg = error.message || '未知错误';
+    
+    // 处理常见错误
+    if (errorMsg.includes('Invalid login credentials')) {
+      errorMsg = '邮箱或密码错误';
+    } else if (errorMsg.includes('Email not confirmed')) {
+      errorMsg = '邮箱未验证，请检查邮箱完成验证';
+    }
+    
+    showError('登录失败: ' + errorMsg);
     return false;
   }
 }
@@ -112,16 +151,33 @@ async function handleLogin(email, password) {
 // 处理注册
 async function handleRegister(email, password, username) {
   try {
+    console.log('开始注册流程，邮箱:', email, '用户名:', username);
+    
+    // 检查Supabase客户端是否已初始化
+    if (!supabaseClient) {
+      console.error('Supabase客户端未初始化');
+      showError('系统错误: Supabase客户端未初始化');
+      return false;
+    }
+    
     // 注册用户
+    console.log('调用Supabase auth.signUp...');
     const { data: authData, error: authError } = await supabaseClient.auth.signUp({
       email,
       password,
     });
     
-    if (authError) throw authError;
+    console.log('Supabase auth.signUp返回:', authData, authError);
+    
+    if (authError) {
+      console.error('Supabase注册错误:', authError);
+      throw authError;
+    }
     
     // 如果注册成功，创建用户配置
-    if (authData.user) {
+    if (authData && authData.user) {
+      console.log('用户创建成功，ID:', authData.user.id, '，开始创建用户配置...');
+      
       const { error: profileError } = await supabaseClient
         .from('profiles')
         .insert([{ 
@@ -131,7 +187,16 @@ async function handleRegister(email, password, username) {
           bio: null
         }]);
         
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('创建用户配置失败:', profileError);
+        throw profileError;
+      }
+      
+      console.log('用户配置创建成功');
+    } else {
+      console.warn('注册返回数据异常:', authData);
+      showError('注册异常，请联系管理员');
+      return false;
     }
     
     console.log('注册成功');
@@ -139,8 +204,19 @@ async function handleRegister(email, password, username) {
     closeRegisterModal();
     return true;
   } catch (error) {
-    console.error('注册错误:', error.message);
-    showError('注册失败: ' + error.message);
+    console.error('注册错误详情:', error);
+    let errorMsg = error.message || '未知错误';
+    
+    // 处理常见错误
+    if (errorMsg.includes('already registered')) {
+      errorMsg = '该邮箱已被注册';
+    } else if (errorMsg.includes('password')) {
+      errorMsg = '密码不符合要求，请使用至少6位字符';
+    } else if (errorMsg.includes('email')) {
+      errorMsg = '邮箱格式不正确';
+    }
+    
+    showError('注册失败: ' + errorMsg);
     return false;
   }
 }
