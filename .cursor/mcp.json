@@ -1,0 +1,21 @@
+{
+    "mcpServers": {
+        "excel": {
+            "url": "http://localhost:8080/sse",
+            "env": {
+                "EXCEL_FILES_PATH": "C:\\Users\\Administrator\\Desktop\\excel-mcp-server-main"
+            }
+        },
+        "amap-amap-sse": {
+            "url": "https://MCP.amap.com/sse?key=e0752d25bc03aa7f7e561cffed6a7096"
+        },
+        "File System": {
+            "command": "npx -y @bunas/fs-mcp@latest",
+            "args": [],
+            "env": {
+                "API_KEY": ""
+            },
+            "fromGalleryId": "bunasQ.fs"
+        }
+    }
+}

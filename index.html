@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<!-- Supabase客户端库 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 <script>
 tailwind.config = {
 theme: {
@@ -1591,5 +1593,75 @@ countEl.textContent = (parseInt(countEl.textContent) + 1).toString();
 });
 });
 </script>
+<!-- 上传模态框 -->
+<div id="upload-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 invisible opacity-0 transition-all">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-medium">上传作品</h3>
+      <button id="close-upload-modal" class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+    <form id="upload-form">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <div id="upload-area" class="upload-area rounded p-4 mb-3 h-64 flex flex-col items-center justify-center cursor-pointer">
+            <div id="upload-placeholder" class="flex flex-col items-center justify-center text-center">
+              <div class="w-16 h-16 flex items-center justify-center text-gray-400 mb-2">
+                <i class="ri-image-add-line text-4xl"></i>
+              </div>
+              <p class="text-gray-500 mb-2">点击或拖拽图片到此处上传</p>
+              <p class="text-xs text-gray-400">支持JPG、PNG、WEBP格式，最大10MB</p>
+            </div>
+            <img id="upload-preview" class="hidden object-contain max-h-full max-w-full" alt="预览图">
+          </div>
+          <input type="file" id="image-upload" class="hidden" accept="image/jpeg,image/png,image/webp">
+        </div>
+        <div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">作品标题</label>
+            <input type="text" id="prompt-title" class="w-full px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="为你的作品取个名字">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">提示词内容</label>
+            <textarea id="prompt-content" rows="5" class="w-full px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="输入生成该图片的完整提示词..."></textarea>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">使用模型</label>
+            <select id="prompt-model" class="w-full px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+              <option value="">请选择模型</option>
+              <option value="Midjourney">Midjourney</option>
+              <option value="Stable Diffusion">Stable Diffusion</option>
+              <option value="DALL-E">DALL-E</option>
+              <option value="Firefly">Firefly</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">标签</label>
+            <input type="text" id="prompt-tags" class="w-full px-3 py-2 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="输入标签，用空格分隔">
+            <div class="flex flex-wrap gap-2 mt-2" id="tags-container">
+              <!-- 这里会动态添加标签 -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6">
+        <button type="submit" class="w-full bg-primary text-white py-3 rounded !rounded-button hover:bg-opacity-90 transition">发布作品</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 引入应用脚本 -->
+<script src="js/app.js"></script>
+
+<!-- 悬浮按钮 -->
+<button id="upload-button" class="fixed right-6 bottom-6 w-14 h-14 bg-primary rounded-full shadow-lg flex items-center justify-center text-white z-30 hover:bg-opacity-90 transition">
+  <div class="w-6 h-6 flex items-center justify-center">
+    <i class="ri-add-line text-xl"></i>
+  </div>
+</button>
+
 </body>
 </html>
