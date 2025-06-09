@@ -1,7 +1,7 @@
 // Supabase配置
 // 请替换为你在Supabase项目设置中获取的实际URL和匿名密钥
-const SUPABASE_URL = 'https://your-supabase-url.supabase.co';
-const SUPABASE_ANON_KEY = 'your-supabase-anon-key';
+const SUPABASE_URL = 'https://fqixvvcjzdlhohvyxgav.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxaXh2dmNqemRsaG9odnl4Z2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNjc2NzcsImV4cCI6MjA2NDk0MzY3N30.gR1MLuncTnUK6HvUUfmRkAtrvH7p1vowWr3EG8buqQI';
 let supabaseClient;
 
 // 初始化Supabase客户端
