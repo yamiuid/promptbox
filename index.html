@@ -389,7 +389,8 @@ window.addEventListener('load', function() {
 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">我的上传</a>
 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">设置</a>
 <div class="border-t border-gray-100 my-1"></div>
-<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">登录 / 注册</a>
+<a href="#" id="login-button" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">登录</a>
+<a href="#" id="register-button" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">注册</a>
 </div>
 </div>
 </div>
@@ -1655,6 +1656,20 @@ countEl.textContent = (parseInt(countEl.textContent) + 1).toString();
 
 <!-- 引入应用脚本 -->
 <script src="js/app.js"></script>
+
+<!-- 初始化Supabase和用户认证 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 检查Supabase是否已加载
+  if (typeof supabase !== 'undefined') {
+    console.log('初始化Supabase客户端');
+    initSupabase();
+  } else {
+    console.error('Supabase库未加载，请检查网络连接');
+    alert('应用加载错误：缺少必要的组件。请刷新页面或检查网络连接。');
+  }
+});
+</script>
 
 <!-- 悬浮按钮 -->
 <button id="upload-button" class="fixed right-6 bottom-6 w-14 h-14 bg-primary rounded-full shadow-lg flex items-center justify-center text-white z-30 hover:bg-opacity-90 transition">
