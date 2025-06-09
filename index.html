@@ -223,62 +223,65 @@ margin: 0;
 
 <script>
 // 全局定义弹窗函数，方便调试
-let detailModalFunctions = {
-  openDetailModal: function(id) {
-    console.log('全局函数：尝试打开弹窗，ID:', id);
-    setTimeout(function() {
-      // 等待DOM加载完毕后再执行
+// 检查是否已经定义了这些函数，避免重复声明
+if (!window.openDetailModal) {
+  let detailModalFunctions = {
+    openDetailModal: function(id) {
+      console.log('全局函数：尝试打开弹窗，ID:', id);
+      setTimeout(function() {
+        // 等待DOM加载完毕后再执行
+        const detailModal = document.getElementById('detail-modal');
+        if (!detailModal) {
+          console.error('找不到弹窗元素');
+          return;
+        }
+        
+        // 硬编码一些简单的数据用于测试
+        const testData = {
+          author: '测试用户',
+          avatar: '测',
+          avatarColor: 'from-blue-400 to-purple-500',
+          likes: 123,
+          collects: 45,
+          prompt: '这是一段测试提示词',
+          model: '测试模型',
+          params: [
+            { name: '参数1', value: '值1' },
+            { name: '参数2', value: '值2' }
+          ],
+          tags: ['测试标签1', '测试标签2'],
+          comments: [
+            { user: '评论用户', avatar: '评', avatarColor: 'from-green-400 to-teal-500', content: '这是一条测试评论', time: '刚刚' }
+          ]
+        };
+        
+        // 填充弹窗内容
+        document.getElementById('modal-author').textContent = testData.author;
+        document.getElementById('modal-likes').textContent = testData.likes;
+        document.getElementById('modal-collects').textContent = testData.collects;
+        document.getElementById('modal-prompt').textContent = testData.prompt;
+        document.getElementById('modal-model').textContent = testData.model;
+        
+        // 显示弹窗
+        detailModal.classList.remove('invisible', 'opacity-0');
+        document.body.style.overflow = 'hidden';
+      }, 100);
+    },
+    
+    closeDetailModal: function() {
+      console.log('全局函数：关闭弹窗');
       const detailModal = document.getElementById('detail-modal');
-      if (!detailModal) {
-        console.error('找不到弹窗元素');
-        return;
+      if (detailModal) {
+        detailModal.classList.add('invisible', 'opacity-0');
+        document.body.style.overflow = '';
       }
-      
-      // 硬编码一些简单的数据用于测试
-      const testData = {
-        author: '测试用户',
-        avatar: '测',
-        avatarColor: 'from-blue-400 to-purple-500',
-        likes: 123,
-        collects: 45,
-        prompt: '这是一段测试提示词',
-        model: '测试模型',
-        params: [
-          { name: '参数1', value: '值1' },
-          { name: '参数2', value: '值2' }
-        ],
-        tags: ['测试标签1', '测试标签2'],
-        comments: [
-          { user: '评论用户', avatar: '评', avatarColor: 'from-green-400 to-teal-500', content: '这是一条测试评论', time: '刚刚' }
-        ]
-      };
-      
-      // 填充弹窗内容
-      document.getElementById('modal-author').textContent = testData.author;
-      document.getElementById('modal-likes').textContent = testData.likes;
-      document.getElementById('modal-collects').textContent = testData.collects;
-      document.getElementById('modal-prompt').textContent = testData.prompt;
-      document.getElementById('modal-model').textContent = testData.model;
-      
-      // 显示弹窗
-      detailModal.classList.remove('invisible', 'opacity-0');
-      document.body.style.overflow = 'hidden';
-    }, 100);
-  },
-  
-  closeDetailModal: function() {
-    console.log('全局函数：关闭弹窗');
-    const detailModal = document.getElementById('detail-modal');
-    if (detailModal) {
-      detailModal.classList.add('invisible', 'opacity-0');
-      document.body.style.overflow = '';
     }
-  }
-};
+  };
 
-// 将函数暴露到全局
-window.openDetailModal = detailModalFunctions.openDetailModal;
-window.closeDetailModal = detailModalFunctions.closeDetailModal;
+  // 将函数暴露到全局
+  window.openDetailModal = detailModalFunctions.openDetailModal;
+  window.closeDetailModal = detailModalFunctions.closeDetailModal;
+}
 
 // 页面加载后自动注册事件处理
 window.addEventListener('load', function() {
@@ -1649,18 +1652,10 @@ countEl.textContent = (parseInt(countEl.textContent) + 1).toString();
 <!-- 引入应用脚本 -->
 <script src="js/app.js"></script>
 
-<!-- 初始化Supabase和用户认证 -->
+<!-- 注意：Supabase初始化已移至app.js文件中，不要在这里重复初始化 -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // 检查Supabase是否已加载
-  if (typeof supabase !== 'undefined') {
-    console.log('初始化Supabase客户端');
-    initSupabase();
-  } else {
-    console.error('Supabase库未加载，请检查网络连接');
-    alert('应用加载错误：缺少必要的组件。请刷新页面或检查网络连接。');
-  }
-});
+// 这里不再需要初始化Supabase，因为app.js已经处理了
+console.log('Supabase初始化由app.js处理');
 </script>
 
 <!-- 悬浮按钮 -->
