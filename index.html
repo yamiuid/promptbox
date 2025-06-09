@@ -1469,35 +1469,27 @@ handleFileUpload(file);
 removeImage.addEventListener('click', resetUploadForm);
 });
 </script>
-<!-- 筛选和用户下拉菜单脚本 -->
+<!-- 筛选下拉菜单脚本 -->
 <script id="dropdown-functionality">
 document.addEventListener('DOMContentLoaded', function() {
 const filterButton = document.getElementById('filter-button');
 const filterDropdown = document.getElementById('filter-dropdown');
-const userButton = document.getElementById('user-button');
-const userDropdown = document.getElementById('user-dropdown');
 // 切换筛选下拉菜单
 filterButton.addEventListener('click', (e) => {
 e.stopPropagation();
 filterDropdown.classList.toggle('show');
-userDropdown.classList.remove('show');
+// 如果用户下拉菜单存在，则关闭它
+const userDropdown = document.getElementById('user-dropdown');
+if (userDropdown) {
+  userDropdown.classList.remove('show');
+}
 });
-// 切换用户下拉菜单
-userButton.addEventListener('click', (e) => {
-e.stopPropagation();
-userDropdown.classList.toggle('show');
-filterDropdown.classList.remove('show');
-});
-// 点击其他区域关闭下拉菜单
+// 点击其他区域关闭筛选下拉菜单
 document.addEventListener('click', () => {
 filterDropdown.classList.remove('show');
-userDropdown.classList.remove('show');
 });
-// 阻止下拉菜单内部点击事件冒泡
+// 阻止筛选下拉菜单内部点击事件冒泡
 filterDropdown.addEventListener('click', (e) => {
-e.stopPropagation();
-});
-userDropdown.addEventListener('click', (e) => {
 e.stopPropagation();
 });
 });
