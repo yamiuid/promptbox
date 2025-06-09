@@ -96,7 +96,7 @@ create policy "允许用户删除自己的记录" on prompts for delete using (a
 create table collections (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references auth.users not null,
-  prompt_id uuid references prompts not null,
+  prompt_id uuid references prompts(id) not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   unique(user_id, prompt_id)
 );

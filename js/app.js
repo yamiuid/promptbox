@@ -167,10 +167,22 @@ async function handleRegister(email, password, username) {
       password,
     });
     
-    console.log('Supabase auth.signUp返回:', authData, authError);
+    console.log('Supabase auth.signUp返回:', JSON.stringify(authData, null, 2), authError);
     
     if (authError) {
       console.error('Supabase注册错误:', authError);
+      
+      // 处理常见错误
+      let errorMsg = authError.message || '注册失败';
+      if (errorMsg.includes('already registered')) {
+        errorMsg = '该邮箱已注册，请直接登录或使用其他邮箱';
+      } else if (errorMsg.includes('password')) {
+        errorMsg = '密码不符合要求，请使用至少6位的强密码';
+      } else if (errorMsg.includes('email')) {
+        errorMsg = '邮箱格式不正确，请检查';
+      }
+      
+      showError(errorMsg);
       throw authError;
     }
     
@@ -189,34 +201,29 @@ async function handleRegister(email, password, username) {
         
       if (profileError) {
         console.error('创建用户配置失败:', profileError);
-        throw profileError;
+        
+        // 尝试删除已创建的用户
+        try {
+          await supabaseClient.auth.admin.deleteUser(authData.user.id);
+          console.log('已删除不完整的用户记录');
+        } catch (deleteError) {
+          console.error('无法删除不完整的用户记录:', deleteError);
+        }
+        
+        throw new Error('创建用户配置失败: ' + profileError.message);
       }
       
       console.log('用户配置创建成功');
+      showSuccess('注册成功！请查收验证邮件完成注册');
+      closeRegisterModal();
+      return true;
     } else {
       console.warn('注册返回数据异常:', authData);
       showError('注册异常，请联系管理员');
       return false;
     }
-    
-    console.log('注册成功');
-    showSuccess('注册成功！请检查邮箱完成验证。');
-    closeRegisterModal();
-    return true;
   } catch (error) {
-    console.error('注册错误详情:', error);
-    let errorMsg = error.message || '未知错误';
-    
-    // 处理常见错误
-    if (errorMsg.includes('already registered')) {
-      errorMsg = '该邮箱已被注册';
-    } else if (errorMsg.includes('password')) {
-      errorMsg = '密码不符合要求，请使用至少6位字符';
-    } else if (errorMsg.includes('email')) {
-      errorMsg = '邮箱格式不正确';
-    }
-    
-    showError('注册失败: ' + errorMsg);
+    console.error('注册流程错误:', error);
     return false;
   }
 }
@@ -277,6 +284,9 @@ async function savePrompt(promptData) {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) throw new Error('请先登录');
     
+    console.log('开始保存提示词，用户ID:', user.id);
+    console.log('提示词数据:', JSON.stringify(promptData, null, 2));
+    
     // 保存到数据库
     const { data, error } = await supabaseClient
       .from('prompts')
@@ -291,13 +301,17 @@ async function savePrompt(promptData) {
       }])
       .select();
       
-    if (error) throw error;
+    if (error) {
+      console.error('保存提示词数据库错误:', error);
+      throw error;
+    }
     
     console.log('提示词保存成功:', data);
     showSuccess('作品上传成功！');
     return data[0];
   } catch (error) {
     console.error('保存提示词错误:', error.message);
+    console.error('错误详情:', error);
     showError('保存失败: ' + error.message);
     return null;
   }
@@ -818,9 +832,19 @@ function initUIEvents() {
   const userDropdown = document.getElementById('user-dropdown');
   
   if (userButton && userDropdown) {
-    userButton.addEventListener('click', function(e) {
-      e.stopPropagation();
+    // 移除可能存在的旧事件监听器（通过克隆并替换元素）
+    const newUserButton = userButton.cloneNode(true);
+    userButton.parentNode.replaceChild(newUserButton, userButton);
+    
+    // 添加新的事件监听器
+    newUserButton.addEventListener('click', function(e) {
+      e.stopPropagation(); // 阻止事件冒泡
       userDropdown.classList.toggle('show');
+    });
+    
+    // 阻止下拉菜单点击事件冒泡
+    userDropdown.addEventListener('click', function(e) {
+      e.stopPropagation();
     });
   }
   
@@ -844,124 +868,144 @@ async function loadPrompts() {
 
 // 绑定卡片事件
 function bindCardEvents() {
-  // 绑定卡片点击事件
-  document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', function(e) {
+  console.log('绑定卡片事件');
+  const cards = document.querySelectorAll('.card');
+  
+  cards.forEach(card => {
+    // 移除旧的事件监听器（通过克隆元素）
+    const newCard = card.cloneNode(true);
+    card.parentNode.replaceChild(newCard, card);
+    
+    // 添加新的点击事件
+    newCard.addEventListener('click', function(e) {
       if (!e.target.closest('.like-button') && !e.target.closest('.collect-button')) {
         const id = this.getAttribute('data-id');
         if (window.openDetailModal) {
           window.openDetailModal(id);
-        }
-      }
-    });
-  });
-  
-  // 绑定点赞按钮
-  document.querySelectorAll('.like-button').forEach(button => {
-    button.addEventListener('click', async function(e) {
-      e.stopPropagation();
-      
-      // 检查用户是否登录
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) {
-        promptLogin();
-        return;
-      }
-      
-      const promptId = this.getAttribute('data-id');
-      try {
-        const { error } = await supabaseClient.rpc('increment_likes', {
-          p_id: promptId
-        });
-        
-        if (error) throw error;
-        
-        // 更新UI
-        const countSpan = this.querySelector('span');
-        countSpan.textContent = parseInt(countSpan.textContent) + 1;
-        this.classList.add('active');
-        this.querySelector('i').className = 'ri-heart-fill';
-      } catch (error) {
-        console.error('点赞失败:', error);
-        showError('操作失败，请稍后再试');
-      }
-    });
-  });
-  
-  // 绑定收藏按钮
-  document.querySelectorAll('.collect-button').forEach(button => {
-    button.addEventListener('click', async function(e) {
-      e.stopPropagation();
-      
-      // 检查用户是否登录
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) {
-        promptLogin();
-        return;
-      }
-      
-      const promptId = this.getAttribute('data-id');
-      try {
-        // 检查是否已收藏
-        const { data: existingCollection, error: checkError } = await supabaseClient
-          .from('collections')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('prompt_id', promptId);
-          
-        if (checkError) throw checkError;
-        
-        let action;
-        // 如果已收藏，则取消收藏
-        if (existingCollection && existingCollection.length > 0) {
-          const { error: deleteError } = await supabaseClient
-            .from('collections')
-            .delete()
-            .eq('user_id', user.id)
-            .eq('prompt_id', promptId);
-            
-          if (deleteError) throw deleteError;
-          
-          // 减少收藏计数
-          await supabaseClient.rpc('decrement_collects', {
-            p_id: promptId
-          });
-          
-          action = 'removed';
         } else {
-          // 添加收藏
-          const { error: insertError } = await supabaseClient
-            .from('collections')
-            .insert([{
-              user_id: user.id,
-              prompt_id: promptId
-            }]);
-            
-          if (insertError) throw insertError;
-          
-          // 增加收藏计数
-          await supabaseClient.rpc('increment_collects', {
-            p_id: promptId
-          });
-          
-          action = 'added';
+          console.error('openDetailModal函数未定义');
         }
-        
-        // 更新UI
-        const countSpan = this.querySelector('span');
-        if (action === 'added') {
-          countSpan.textContent = parseInt(countSpan.textContent) + 1;
-          this.classList.add('active');
-          this.querySelector('i').className = 'ri-bookmark-fill';
-        } else {
-          countSpan.textContent = parseInt(countSpan.textContent) - 1;
-          this.classList.remove('active');
-          this.querySelector('i').className = 'ri-bookmark-line';
-        }
-      } catch (error) {
-        console.error('收藏操作失败:', error);
-        showError('操作失败，请稍后再试');
       }
     });
+    
+    // 重新绑定点赞和收藏按钮
+    const likeButton = newCard.querySelector('.like-button');
+    const collectButton = newCard.querySelector('.collect-button');
+    
+    if (likeButton) {
+      likeButton.addEventListener('click', async function(e) {
+        e.stopPropagation();
+        await handleLike(this);
+      });
+    }
+    
+    if (collectButton) {
+      collectButton.addEventListener('click', async function(e) {
+        e.stopPropagation();
+        await handleCollect(this);
+      });
+    }
   });
+}
+
+// 处理点赞
+async function handleLike(button) {
+  // 检查用户是否登录
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    promptLogin();
+    return;
+  }
+  
+  const promptId = button.getAttribute('data-id');
+  const isActive = button.classList.contains('active');
+  
+  try {
+    if (isActive) {
+      // 取消点赞
+      await supabaseClient.rpc('decrement_likes', {
+        p_id: promptId
+      });
+      
+      button.classList.remove('active');
+      button.querySelector('i').className = 'ri-heart-line';
+      const countEl = button.querySelector('span');
+      countEl.textContent = (parseInt(countEl.textContent) - 1).toString();
+    } else {
+      // 添加点赞
+      await supabaseClient.rpc('increment_likes', {
+        p_id: promptId
+      });
+      
+      button.classList.add('active');
+      button.querySelector('i').className = 'ri-heart-fill';
+      const countEl = button.querySelector('span');
+      countEl.textContent = (parseInt(countEl.textContent) + 1).toString();
+    }
+  } catch (error) {
+    console.error('点赞操作失败:', error);
+    showError('操作失败: ' + (error.message || '请稍后再试'));
+  }
+}
+
+// 处理收藏
+async function handleCollect(button) {
+  // 检查用户是否登录
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    promptLogin();
+    return;
+  }
+  
+  const promptId = button.getAttribute('data-id');
+  const isActive = button.classList.contains('active');
+  
+  try {
+    if (isActive) {
+      // 取消收藏
+      const { error: deleteError } = await supabaseClient
+        .from('collections')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('prompt_id', promptId);
+        
+      if (deleteError) throw deleteError;
+      
+      // 减少收藏计数
+      await supabaseClient.rpc('decrement_collects', {
+        p_id: promptId
+      });
+      
+      button.classList.remove('active');
+      button.querySelector('i').className = 'ri-bookmark-line';
+      const countEl = button.querySelector('span');
+      countEl.textContent = (parseInt(countEl.textContent) - 1).toString();
+    } else {
+      // 添加收藏
+      const { error: insertError } = await supabaseClient
+        .from('collections')
+        .insert([{
+          user_id: user.id,
+          prompt_id: promptId
+        }]);
+        
+      if (insertError) {
+        console.error('收藏插入错误:', insertError);
+        throw new Error(`收藏失败: ${insertError.message}`);
+      }
+      
+      // 增加收藏计数
+      await supabaseClient.rpc('increment_collects', {
+        p_id: promptId
+      });
+      
+      button.classList.add('active');
+      button.querySelector('i').className = 'ri-bookmark-fill';
+      const countEl = button.querySelector('span');
+      countEl.textContent = (parseInt(countEl.textContent) + 1).toString();
+    }
+  } catch (error) {
+    console.error('收藏操作失败:', error);
+    showError('操作失败: ' + (error.message || '请稍后再试'));
+  }
 } 

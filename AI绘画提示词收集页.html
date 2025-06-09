@@ -1331,8 +1331,8 @@ cards.forEach(card => {
 card.addEventListener('click', function(e) {
 console.log('卡片被点击了', card.getAttribute('data-id'));
 if (!e.target.closest('.like-button') && !e.target.closest('.collect-button')) {
-  const id = card.getAttribute('data-id');
-  openDetailModal(id);
+const id = card.getAttribute('data-id');
+openDetailModal(id);
 }
 });
 });
