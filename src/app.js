@@ -752,8 +752,81 @@ function initPasswordToggle() {
   console.log('密码显示切换功能已初始化，找到按钮数量:', togglePasswordButtons.length);
 }
 
-// 启动应用
+// 修复模态框显示
+function fixModalDisplay() {
+  // 确保模态框CSS类正确应用
+  document.querySelectorAll('.modal').forEach(modal => {
+    // 移除可能导致问题的内联样式
+    modal.style.cssText = '';
+    
+    // 添加事件监听器来正确显示/隐藏模态框
+    const closeButtons = modal.querySelectorAll('.close-modal');
+    closeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        modal.classList.remove('show');
+      });
+    });
+    
+    // 点击模态框背景关闭
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        modal.classList.remove('show');
+      }
+    });
+  });
+  
+  // 修复登录按钮
+  const loginButton = document.getElementById('login-button');
+  if (loginButton) {
+    loginButton.addEventListener('click', () => {
+      const loginModal = document.getElementById('login-modal');
+      if (loginModal) {
+        loginModal.classList.add('show');
+      }
+    });
+  }
+  
+  // 修复注册按钮
+  const registerButton = document.getElementById('register-button');
+  if (registerButton) {
+    registerButton.addEventListener('click', () => {
+      const registerModal = document.getElementById('register-modal');
+      if (registerModal) {
+        registerModal.classList.add('show');
+      }
+    });
+  }
+  
+  // 修复模态框之间的切换
+  const switchToRegister = document.getElementById('switch-to-register');
+  if (switchToRegister) {
+    switchToRegister.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('login-modal').classList.remove('show');
+      document.getElementById('register-modal').classList.add('show');
+    });
+  }
+  
+  const switchToLogin = document.getElementById('switch-to-login');
+  if (switchToLogin) {
+    switchToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('register-modal').classList.remove('show');
+      document.getElementById('login-modal').classList.add('show');
+    });
+  }
+  
+  console.log('模态框显示功能已修复');
+}
+
+// 在DOM加载完成后执行
 document.addEventListener('DOMContentLoaded', () => {
+  // 初始化密码显示切换功能
+  initPasswordToggle();
+  
+  // 修复模态框显示
+  fixModalDisplay();
+  
   initApp();
   setupAuthListener();
 }); 

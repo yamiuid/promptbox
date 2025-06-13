@@ -898,7 +898,7 @@ function openRegisterModal() {
               <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
                 <i class="ri-eye-off-line"></i>
               </button>
-            </div>
+          </div>
           </div>
           <div class="flex items-center mb-4">
             <input type="checkbox" id="agree-terms" class="mr-2" required>

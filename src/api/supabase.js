@@ -77,7 +77,7 @@ async function testSupabaseConnection() {
     // 检查RLS策略
     console.log('检查RLS策略...');
     const testUser = {
-      user_id: 'test-' + Date.now(),
+      user_id: crypto.randomUUID(),
       username: 'test-user'
     };
     
