@@ -44,6 +44,9 @@ async function initApp() {
     // 初始化事件处理器
     initEventHandlers();
     
+    // 添加密码显示切换功能
+    initPasswordToggle();
+    
     // 加载提示词列表
     await loadPrompts();
     
@@ -721,6 +724,32 @@ function setupAuthListener() {
       loadPrompts(0);
     }
   });
+}
+
+// 初始化密码显示切换功能
+function initPasswordToggle() {
+  const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+  togglePasswordButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // 找到相邻的密码输入框
+      const passwordInput = this.previousElementSibling;
+      if (!passwordInput || passwordInput.type !== 'password' && passwordInput.type !== 'text') {
+        console.error('无法找到密码输入框或元素类型不正确');
+        return;
+      }
+      
+      // 切换密码显示/隐藏
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        this.querySelector('i').className = 'ri-eye-line';
+      } else {
+        passwordInput.type = 'password';
+        this.querySelector('i').className = 'ri-eye-off-line';
+      }
+    });
+  });
+  
+  console.log('密码显示切换功能已初始化，找到按钮数量:', togglePasswordButtons.length);
 }
 
 // 启动应用
