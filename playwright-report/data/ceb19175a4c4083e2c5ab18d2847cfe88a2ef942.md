@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - link "logo AI绘画宝库":
+    - /url: "#"
+  - text: 
+  - searchbox "搜索提示词、模型或标签..."
+  - button " 筛选"
+  - button "登录"
+  - button "注册"
+- main:
+  - button "全部"
+  - button "风景"
+  - button "人物"
+  - button "动物"
+  - button "科幻"
+  - text: 
+  - paragraph: 暂无提示词数据
+  - button "上传第一个提示词"
+- button ""
+- heading "注册账号" [level=2]
+- button ""
+- text: 用户名 
+- textbox "请输入用户名"
+- text: 邮箱 
+- textbox "请输入邮箱"
+- text: 密码 
+- textbox "请输入密码"
+- button ""
+- checkbox "我已阅读并同意 服务条款 和 隐私政策"
+- text: 我已阅读并同意
+- link "服务条款":
+  - /url: "#"
+- text: 和
+- link "隐私政策":
+  - /url: "#"
+- button "注册"
+- text: 已有账号？
+- link "立即登录":
+  - /url: "#"
+```

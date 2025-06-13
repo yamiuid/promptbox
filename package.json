@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@playwright/test": "^1.53.0",
+    "masonry-layout": "^4.2.2"
+  }
+}

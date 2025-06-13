@@ -1,0 +1,186 @@
+/* 全局样式，确保所有文本元素默认采用水平排列 */
+* {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  letter-spacing: normal !important;
+  text-align: initial;
+  direction: ltr;
+}
+
+/* 导航栏样式增强 */
+nav {
+  text-orientation: mixed !important;
+}
+
+/* 导航栏中的按钮和文字 */
+nav button, 
+nav span, 
+nav a,
+nav label,
+nav option,
+nav input,
+.btn,
+.tag {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* 下拉菜单内容 */
+.filter-dropdown,
+.user-dropdown {
+  writing-mode: horizontal-tb !important;
+}
+
+/* 确保卡片内文字显示正常 */
+.card,
+.card-content,
+.card-title,
+.card-text {
+  writing-mode: horizontal-tb !important;
+}
+
+/* 模态框内容 */
+.modal,
+.modal-content,
+.modal h2,
+.modal button,
+.modal input,
+.modal label {
+  writing-mode: horizontal-tb !important;
+}
+
+/* 修复中文文本可能出现的竖排问题 */
+:lang(zh),
+:lang(zh-CN),
+:lang(zh-TW) {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* 防止任何可能的transform导致文本旋转 */
+* {
+  transform: none !important;
+}
+
+/* 确保文本方向正确 */
+body {
+  direction: ltr !important;
+  text-orientation: mixed;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+/* 导航栏布局修复 */
+nav .max-w-7xl {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+/* 确保导航栏左侧logo区域显示正确 */
+nav a.flex {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  min-width: 120px;
+  margin-right: 10px;
+}
+
+/* 调整搜索框区域的宽度 */
+nav .relative.w-full.max-w-xl {
+  width: 40% !important;
+  min-width: 200px;
+  max-width: 400px;
+  margin: 0 10px !important;
+}
+
+/* 修复导航栏右侧按钮区域 */
+nav .flex.items-center.gap-4 {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  margin-left: auto;
+  white-space: nowrap !important;
+  min-width: 160px;
+}
+
+/* 修复筛选按钮布局 */
+#filter-button {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 修复筛选按钮内的图标对齐 */
+#filter-button .w-5 {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-right: 2px !important;
+}
+
+/* 确保登录注册按钮布局正确 */
+.flex.space-x-3 {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 0.75rem !important;
+}
+
+/* 修复登录注册按钮文字居中问题 */
+#login-button, #register-button {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  line-height: 1.5 !important;
+  height: 38px !important;
+}
+
+/* 修复所有按钮文字居中 */
+.btn {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+}
+
+/* 修复标签按钮文字居中 */
+main button {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+}
+
+/* 修复热门标签区域 */
+main .flex.gap-3 {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+/* 修复模态框中的提交按钮文字居中 */
+#login-form button[type="submit"],
+#register-form button[type="submit"],
+#upload-form button[type="submit"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  height: 48px !important; /* 稍微增加高度让按钮更好看 */
+  font-size: 16px !important; /* 稍微增大字体 */
+}
+
+/* 确保所有中文文本显示正确 */
+body {
+  text-orientation: mixed;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+/* 确保文本可以正常折行但不会意外竖排 */
+.text-2xl, .text-lg, .text-sm {
+  white-space: normal;
+} 
